@@ -18,22 +18,50 @@
     AVAudioPlayer* audioPlayer;
     UIImageView* may1;
         UIImageView* may2;
+     CATransform3D t;
     FLAnimatedImageView* chimBay;
+    FLAnimatedImageView* vcop;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self playSong];
+//    [self playSong];
     [self addSprite];
     [self mayBay1];
     [self mayBay2];
+    [self runningCop];
     chimBay.frame=CGRectMake(0, 250, 50, 50);
     chimBay.alpha=0.2;
     [UIView animateWithDuration:8 animations:^{
-        chimBay.frame=CGRectMake(200, 340, 200, 200);
+        chimBay.frame=CGRectMake(200, 340, 100, 100);
         chimBay.alpha=1;
     } completion:^(BOOL finished) {
         [self runningBay];
+    }];
+}
+-(void) runningCop{
+                vcop.transform=CGAffineTransformMakeScale(1, 1);
+    [UIView animateWithDuration:5 animations:^{
+        vcop.frame=CGRectMake(0, 470, 85, 40);
+        
+    } completion:^(BOOL finished) {
+        vcop.transform=CGAffineTransformConcat( CGAffineTransformMakeScale(-1, 1), CGAffineTransformMakeRotation(0) );
+        [UIView animateWithDuration:5 animations:^{
+         vcop.frame=CGRectMake(200, 470, 85, 40);
+        } completion:^(BOOL finished) {
+            [self runningCop];
+        }];
+    }];
+}
+-(void) runningBay{
+    [UIView animateWithDuration:5 animations:^{
+        chimBay.frame=CGRectMake(-50, 200, 150, 150);
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:5 animations:^{
+            chimBay.frame=CGRectMake(200, 200, 150, 150);
+        } completion:^(BOOL finished) {
+            [self runningBay];
+        }];
     }];
 }
 -(void) mayBay1{
@@ -55,7 +83,15 @@
     }];
 }
 -(void) addSprite{
-    UIImageView* vImgHouse=[[UIImageView alloc] initWithFrame:CGRectMake(200, 470, 200, 186)];
+    
+    FLAnimatedImage *imgCop = [FLAnimatedImage animatedImageWithGIFData:[NSData dataWithContentsOfURL:[NSURL fileURLWithPath:[self getPathForFileName:@"cop" andType:@"gif"]]]];
+    vcop = [[FLAnimatedImageView alloc] init];
+    vcop.animatedImage = imgCop;
+     vcop.frame=CGRectMake(400, 470, 85, 40);
+    vcop.animationDuration=4;
+    [self.view addSubview:vcop];
+    
+    UIImageView* vImgHouse=[[UIImageView alloc] initWithFrame:CGRectMake(240, 450, 170, 160)];
     vImgHouse.animationImages=@[
                                 [UIImage imageNamed:@"house1"],
                                 [UIImage imageNamed:@"house2"],
@@ -94,22 +130,29 @@
     may2=[UIImageView new];
     may2.image=[UIImage imageNamed:@"may1"];
     [self.view addSubview:may2];
-    
-    FLAnimatedImage *image = [FLAnimatedImage animatedImageWithGIFData:[NSData dataWithContentsOfURL:[NSURL URLWithString:@"http://orig05.deviantart.net/2fa8/f/2015/020/7/0/pixel_dragonbunny_by_dunceneygak-d8eoxj2.gif"]]];
+
+    FLAnimatedImage *image = [FLAnimatedImage animatedImageWithGIFData:[NSData dataWithContentsOfURL:[NSURL fileURLWithPath:[self getPathForFileName:@"chimBay" andType:@"gif"]]]];
     chimBay = [[FLAnimatedImageView alloc] init];
     chimBay.animatedImage = image;
     [self.view addSubview:chimBay];
+    
+
+    FLAnimatedImage *imgDaragon = [FLAnimatedImage animatedImageWithGIFData:[NSData dataWithContentsOfURL:[NSURL fileURLWithPath:[self getPathForFileName:@"monterDragon" andType:@"gif"]]]];
+    FLAnimatedImageView* dragon = [[FLAnimatedImageView alloc] init];
+    dragon.animatedImage = imgDaragon;
+    dragon.frame=CGRectMake(170, 500, 267, 200);
+    [self.view addSubview:dragon];
+    
+    FLAnimatedImage *imgDK = [FLAnimatedImage animatedImageWithGIFData:[NSData dataWithContentsOfURL:[NSURL fileURLWithPath:[self getPathForFileName:@"darkSoul" andType:@"gif"]]]];
+    FLAnimatedImageView* vDK = [[FLAnimatedImageView alloc] init];
+    vDK.animatedImage = imgDK;
+    vDK.frame=CGRectMake(-70, 470, 352, 192);
+    [self.view addSubview:vDK];
+    
 }
--(void) runningBay{
-    [UIView animateWithDuration:5 animations:^{
-        chimBay.frame=CGRectMake(-50, 340, 200, 200);
-    } completion:^(BOOL finished) {
-        [UIView animateWithDuration:5 animations:^{
-            chimBay.frame=CGRectMake(200, 340, 200, 200);
-        } completion:^(BOOL finished) {
-            [self runningBay];
-        }];
-    }];
+
+-(NSString*)getPathForFileName:(NSString*) fileName andType:(NSString*) type{
+    return  [[NSBundle mainBundle] pathForResource:fileName ofType:type];
 }
 - (void) playSong {
     NSString* filePath = [[NSBundle mainBundle] pathForResource:@"dance_with_the_devil" ofType:@"mp3"];
